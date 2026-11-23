@@ -1,6 +1,6 @@
 # TinyBEV
 
-This repository contains a PyTorch implementation of the method presented in *TinyBEV: Cross-Modal Knowledge Distillation for Efficient Multi-Task Bird’s-Eye-View Perception and Planning* by Khan and Gauch, ICCV Workshops 2025. It includes the student, five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command. [Paper](https://reeshad-khan.github.io/assets/papers/tinybev.pdf)
+Official PyTorch implementation of **TinyBEV**, presented by Reeshad Khan and John Gauch at ICCV Workshops 2025. This repository includes the student model and its five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command. [TinyBEV: Cross-Modal Knowledge Distillation for Efficient Multi-Task Bird’s-Eye-View Perception and Planning](https://reeshad-khan.github.io/assets/papers/tinybev.pdf)
 
 ## Verification status
 
@@ -8,7 +8,7 @@ The synthetic CPU check exercises forward passes, backpropagation through lift�
 
 The one-epoch nuScenes mini sanity check completed official detection and tracking evaluation. A separate ten-frame UniAD cache integration check exercised the S3 training path. Full trainval parity with Table 2 remains unverified.
 
-The paper reports S1 L2@3s as 1.40 m in Table 2 and 1.30 m in Figure 2. For S3, Table 2 reports 0.78 m minADE and 1.08 m planning L2@3s, while the abstract calls 1.08 minADE. Section 3.3 says minADE is omitted from motion evaluation, yet Table 2 includes it. This reproduction uses the Table 2 targets and computes the single-mode matched-agent ADE described below.
+The paper reports S1 L2@3s as 1.40 m in Table 2 and 1.30 m in Figure 2. For S3, Table 2 reports 0.78 m minADE and 1.08 m planning L2@3s, while the abstract calls 1.08 minADE. Section 3.3 says minADE is omitted from motion evaluation, yet Table 2 includes it. The benchmark comparison uses the Table 2 targets and computes the single-mode matched-agent ADE described below.
 
 ## Install
 
