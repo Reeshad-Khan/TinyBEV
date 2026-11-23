@@ -1,12 +1,12 @@
 # TinyBEV
 
-PyTorch re-implementation of **TinyBEV** by the paper's authors, Reeshad Khan and John Gauch (ICCV Workshops 2025). It includes the student model and its five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command.
+Official PyTorch implementation of **TinyBEV**, by Reeshad Khan and John Gauch (ICCV Workshops 2025). It includes the student model and its five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command.
 
 Paper: [IEEE Xplore](https://doi.org/10.1109/ICCVW69036.2025.00481) · [arXiv](https://arxiv.org/abs/2509.18372) · [PDF](https://reeshad-khan.github.io/assets/papers/tinybev.pdf)
 
 ## Status
 
-The model, training pipeline, and evaluation have been tested end to end: a synthetic CPU check covers forward and backward passes, optimizer updates for all four variants (S0–S3), and inference decoding; a one-epoch nuScenes mini run completes the official detection and tracking evaluation; and a ten-frame UniAD cache check exercises the S3 distillation path. The default inference model has 28,020,946 trainable parameters, matching the 28M reported in the paper. Full-scale nuScenes trainval results have not yet been reproduced with this codebase; they will be added here when available.
+The model, training pipeline, and evaluation have been tested end to end: a synthetic CPU check covers forward and backward passes, optimizer updates for all four variants (S0–S3), and inference decoding; a one-epoch nuScenes mini run completes the official detection and tracking evaluation; and a ten-frame UniAD cache check exercises the S3 distillation path. The default inference model has 28,020,946 trainable parameters, matching the 28M reported in the paper. Trained checkpoints and full-scale nuScenes trainval results from this codebase will be added here.
 
 ## Errata
 
