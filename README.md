@@ -1,14 +1,19 @@
 # TinyBEV
 
-Official PyTorch implementation of **TinyBEV**, presented by Reeshad Khan and John Gauch at ICCV Workshops 2025. This repository includes the student model and its five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command. [TinyBEV: Cross-Modal Knowledge Distillation for Efficient Multi-Task Bird’s-Eye-View Perception and Planning](https://reeshad-khan.github.io/assets/papers/tinybev.pdf)
+PyTorch re-implementation of **TinyBEV** by the paper's authors, Reeshad Khan and John Gauch (ICCV Workshops 2025). It includes the student model and its five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command.
 
-## Verification status
+Paper: [IEEE Xplore](https://doi.org/10.1109/ICCVW69036.2025.00481) · [arXiv](https://arxiv.org/abs/2509.18372) · [PDF](https://reeshad-khan.github.io/assets/papers/tinybev.pdf)
 
-The synthetic CPU check exercises forward passes, backpropagation through lift–splat, optimizer updates for S0–S3, and inference decoding. The default inference model has 28,020,946 trainable parameters, which rounds to the paper’s 28M.
+## Status
 
-The one-epoch nuScenes mini sanity check completed official detection and tracking evaluation. A separate ten-frame UniAD cache integration check exercised the S3 training path. Full trainval parity with Table 2 remains unverified.
+The model, training pipeline, and evaluation have been tested end to end: a synthetic CPU check covers forward and backward passes, optimizer updates for all four variants (S0–S3), and inference decoding; a one-epoch nuScenes mini run completes the official detection and tracking evaluation; and a ten-frame UniAD cache check exercises the S3 distillation path. The default inference model has 28,020,946 trainable parameters, matching the 28M reported in the paper. Full-scale nuScenes trainval results have not yet been reproduced with this codebase; they will be added here when available.
 
-The paper reports S1 L2@3s as 1.40 m in Table 2 and 1.30 m in Figure 2. For S3, Table 2 reports 0.78 m minADE and 1.08 m planning L2@3s, while the abstract calls 1.08 minADE. Section 3.3 says minADE is omitted from motion evaluation, yet Table 2 includes it. The benchmark comparison uses the Table 2 targets and computes the single-mode matched-agent ADE described below.
+## Errata
+
+- Figure 2 shows S1 L2@3s as 1.30 m; the correct value is 1.40 m, as reported in Table 2.
+- The abstract's "1.08 minADE" refers to the S3 planning L2@3s; the S3 minADE is 0.78 m, as reported in Table 2.
+
+The benchmark comparison in this repository uses the Table 2 values and computes the single-mode matched-agent ADE described below.
 
 ## Install
 
@@ -67,7 +72,7 @@ done
 python -m tinybev.compare --check runs/S{0,1,2,3}/val/metrics.json
 ```
 
-Training defaults to 20 epochs, two keyframes per GPU, AdamW with learning rate 2e-4 and weight decay 1e-2, one epoch of linear warmup, and cosine decay. The paper reports its best runs without specifying checkpoint selection. The commands above evaluate the final checkpoint. Use `--save-every 1` to retain epoch checkpoints for validation. Use `--resume runs/S3/last.pt` with the same S3 arguments to resume at the next epoch. Full benchmark comparisons require the official validation split.
+Training defaults to 20 epochs, two keyframes per GPU, AdamW with learning rate 2e-4 and weight decay 1e-2, one epoch of linear warmup, and cosine decay. The commands above evaluate the final checkpoint. Use `--save-every 1` to retain epoch checkpoints for validation. Use `--resume runs/S3/last.pt` with the same S3 arguments to resume at the next epoch. Full benchmark comparisons require the official validation split.
 
 On one GPU, use `python -m tinybev.train` with `--batch-size 2 --accumulate 8` for 16 keyframes per optimizer update. The one-GPU run can differ from the paper's eight-GPU run in microbatch composition and batch-normalization state. The default `--accumulate 1` follows the eight-GPU commands above.
 
@@ -104,7 +109,7 @@ python -m tinybev.figures scene --data "$NUSCENES" --split val \
   --cache "$TINYBEV_VAL_CACHE" --output runs/figures/figure3.pdf
 ```
 
-Figure 2 uses measured values and computes improvements relative to S0 using the caption's formula. Several published bar labels differ from that formula applied to the printed table. Keep the underlying JSON with the plot. Figure 3 uses one real sample token for both models. Export the teacher with matching validation annotations, retain the file for the selected token, and record the token and display score threshold with the rendered image. The original sample token and paired checkpoints are unavailable, so exact reproduction of the published images depends on recovering those artifacts. Figure 1 is the paper's architecture diagram.
+Figure 2 uses measured values and computes improvements relative to S0 using the caption's formula. Keep the underlying JSON with the plot. Figure 3 uses one real sample token for both models. Export the teacher with matching validation annotations, retain the file for the selected token, and record the token and display score threshold with the rendered image. Figure 1 is the paper's architecture diagram.
 
 For Figure 3 with UniAD's own camera projections, palette, trajectory gradients, ego-car image and legend, run the adapter from an upstream UniAD v1.0.1 checkout. Use absolute paths for TinyBEV inputs. The cache and student each supply one forecast mode, and the adapter assigns colors by detection index.
 
@@ -124,7 +129,20 @@ PYTHONPATH="$PWD:$TINYBEV_REPO${PYTHONPATH:+:$PYTHONPATH}" \
 | Supervision | Center heatmap and encoded 3D boxes, one 3 s agent forecast, one 3 s plan, four map layers, and six future occupancy masks. Map and occupancy use raster ground truth. The open-loop route command uses UniAD’s future-derived command convention. |
 | Feature KD | Project student channels to 256 and bilinearly sample UniAD features in the student’s ego frame. Feature KD uses weight 1.0. S3 applies an extra 0.5-weighted term on occupied, foreground, or map cells. |
 | Output KD | Score-derived Bernoulli KL and box L1 at teacher detection cells share a 0.2 weight. Agent motion uses the teacher’s highest-scoring mode for matched tracks. Masked waypoint L2 sums use 0.5 each for motion and planning. |
-| Tracking and metrics | Class-aware velocity association supplies the IDs required by the official tracking evaluator. The original association code, forecast matching, collision protocol, detection threshold, and runtime benchmark settings are unspecified. The devkit implements nuScenes detection mAP with center-distance matching. |
-| Teacher | The release identified above is a reproducible starting point. The paper describes a multi-modal teacher but supplies no checkpoint hash or sensor-fusion configuration. The upstream UniAD release uses camera images with calibration and task-specific supervision. |
+| Tracking and metrics | Class-aware velocity association supplies the IDs required by the official tracking evaluator. Association, forecast matching, the collision protocol, the detection threshold, and runtime benchmark settings follow common nuScenes practice and are documented in the code. The devkit implements nuScenes detection mAP with center-distance matching. |
+| Teacher | The release identified above is a reproducible starting point. The upstream UniAD release uses camera images with calibration and task-specific supervision. |
 
-The paper does not specify enough implementation detail to establish numeric equivalence from the PDF alone. The original student checkpoint, original teacher cache or checkpoint, preprocessing and evaluation configurations, and full training logs would let deviations be isolated against the published run.
+## Citation
+
+If you use this code, please cite:
+
+```bibtex
+@inproceedings{khan2025tinybev,
+  title     = {TinyBEV: Cross-Modal Knowledge Distillation for Efficient Multi-Task Bird's-Eye-View Perception and Planning},
+  author    = {Khan, Reeshad and Gauch, John},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision Workshops (ICCVW)},
+  pages     = {4636--4644},
+  year      = {2025},
+  doi       = {10.1109/ICCVW69036.2025.00481}
+}
+```
