@@ -1,6 +1,6 @@
 # TinyBEV
 
-This is a PyTorch reconstruction of *TinyBEV: Cross-Modal Knowledge Distillation for Efficient Multi-Task Bird’s-Eye-View Perception and Planning*, Khan and Gauch, ICCV Workshops 2025. [Paper](https://reeshad-khan.github.io/assets/papers/tinybev.pdf). It includes the student, five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command.
+This repository contains a PyTorch implementation of the method presented in *TinyBEV: Cross-Modal Knowledge Distillation for Efficient Multi-Task Bird’s-Eye-View Perception and Planning* by Khan and Gauch, ICCV Workshops 2025. It includes the student, five task heads, offline UniAD teacher export, four ablation recipes, nuScenes evaluation, and a Table 2 comparison command. [Paper](https://reeshad-khan.github.io/assets/papers/tinybev.pdf)
 
 ## Verification status
 
@@ -89,7 +89,7 @@ python -m tinybev.evaluate --data "$NUSCENES" --split mini_val \
 
 Evaluation exports nuScenes detection and tracking JSON and invokes the official devkit for mAP, NDS, AMOTA, and AMOTP. It reports planning L2 at step six, mean footprint collision percentage across valid waypoints excluding ground-truth collisions, single-mode forecast ADE over class-matched detections within 2 m, and the number of eligible and matched agents. Map and occupancy IoU are supplemental. FPS measures the warmed, synchronized batch-one forward and decode path on the requested device. The metrics JSON records the checkpoint path, epoch, training settings, score threshold, PyTorch and CUDA versions, and evaluation GPU. The comparison prints the measured values and deltas and fails with `--check` if any displayed precision differs.
 
-## Compare reconstruction experiments
+## Compare experiments
 
 Keep the paper settings as the baseline. Save each candidate to its own run directory, record the seed, and vary one under-specified choice at a time. The trainer records `--kd-weights FEATURE DETECTION MOTION PLAN REGION` in its checkpoints. The defaults are `1.0 0.2 0.5 0.5 0.5`. For initial experiments, compare detection score thresholds on the same checkpoint, then compare distillation variants with the same splits and hardware. Report per-metric deltas for each candidate. Use `--rank` to rank complete runs within each variant by mean absolute relative error across all eight Table 2 metrics. Use `--check` independently to test reported precision.
 
@@ -116,7 +116,7 @@ PYTHONPATH="$PWD:$TINYBEV_REPO${PYTHONPATH:+:$PYTHONPATH}" \
   --cache "$TINYBEV_VAL_CACHE" --output "$FIGURE3_PDF"
 ```
 
-## Reconstruction decisions
+## Implementation details
 
 | Area | Choice |
 | --- | --- |
